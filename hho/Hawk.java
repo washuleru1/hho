@@ -61,8 +61,10 @@ public class Hawk extends Problem {
 			if(Math.abs(escapeEnergy) >= 1 ) {
 				//ecuacion 1 
 				if(randomValues.getQ() >= 0.5) {
+					//System.out.println("Position ecc 1.1");
 					x[j]  =  toBinary(x[j] - randomValues.getR1() * Math.abs(x[j] - (2 * randomValues.getR2() * g.x[j])));
-				} else {    
+				} else {  
+					//System.out.println("Position ecc 1.2");  
 					x[j] = toBinary(p[j] - averageHawksPosition - randomValues.getR3() * (LB + randomValues.getR4() * (UB - LB)));
 				}
  
@@ -128,7 +130,6 @@ public class Hawk extends Problem {
 		if (object instanceof Hawk) {
 			System.arraycopy(((Hawk) object).x, 0, this.x, 0, nVars);
 			System.arraycopy(((Hawk) object).p, 0, this.p, 0, nVars);
-			System.arraycopy(((Hawk) object).v, 0, this.v, 0, nVars);
 		}
 	}
 
@@ -148,6 +149,11 @@ public class Hawk extends Problem {
 
 	static double gammaFunction(double x) { return Math.exp(logGamma(x)); }
 
+	public double avg(int[] a) {
+		return java.util.Arrays.stream(a).average().getAsDouble();
+   	}
 
-
+	protected double avgA() {
+    	return avg(x);
+    }
 }
