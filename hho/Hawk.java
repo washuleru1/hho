@@ -93,10 +93,17 @@ public class Hawk extends Problem {
 
 				} else if (r < 0.5 && Math.abs(escapeEnergy) < 0.5) { // hard beseige with progressive rapid dives
 					// // update the location vector (updatePBest?) usando la ecuación (11) del paper
-					
+					S = StdRandom.uniform(2);
+					//primero calcular (7)
+					Y = p[j] - escapeEnergy * Math.abs((rabbitJump * p[j]) - averageHawksPosition);
+					//Calcular (9)
+					levyFlight = 0.01 * (u*sigma/Math.pow(Math.abs(v), (1/beta)));
+					//calcular (10)
+					Z = Y + S * levyFlight;
+					if (toBinary(Y) < x[j]) x[j] = toBinary(Y);
+					if (toBinary(Z) < x[j]) x[j] = toBinary(Z);
 				} 
 			}
-
 
 		}
 	}
