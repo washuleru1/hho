@@ -14,6 +14,10 @@ public class Hawk extends Problem {
 		}
 	}
 
+    public int[] getPositionVector(){
+        return this.x;
+    }
+
 
     public double randomPosition() {
         return 2.3;
@@ -49,6 +53,11 @@ public class Hawk extends Problem {
 			v[j] = v[j] * theta + alpha * StdRandom.uniform() * (g.p[j] - x[j]) + beta * StdRandom.uniform() * (p[j] - x[j]);
 			/* Actualizar posicion */
 			x[j] = toBinary(x[j] + v[j]);
+
+			//ver si se deja lo de arriba, x[j] es la posición del hawk, pero no utilizamos las velocidades
+			
+
+
 		}
 	}
 
