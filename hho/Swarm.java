@@ -9,18 +9,13 @@ public class Swarm {
     private final int maxItter = 1000;
     private final int populationSize = 25;
     private static final double beta = 1.5;
-    private double u, v = 0;
     private double escapeEnergy = 0;
     private double baseEnergy = 0;
-    private double q, r1, r2, r3, r4 = 0;
-    private double rabbitJump = 0;
-    private double UB = 1;
-    private double LB = 0;
     private double r = 0.5;
     private double[] nextLocation;
     private double deltaXt = 0;
-    private double sigma = 0;
     private double levyFlight = 0;
+    private Randoms randomValues;
 
 
     public void execute() {
@@ -57,11 +52,7 @@ public class Swarm {
             int[] actualHawkPosition;
             // seteo de valores random
             // pasar q y r's a función move, mejor pasarlo como objeto estilo: move(randoms, ....) donde  randoms contiene: randoms.r1, randoms.r2, randoms.q, ...
-            q = StdRandom.uniform();
-            r1 = StdRandom.uniform();
-            r2 = StdRandom.uniform();
-            r3 = StdRandom.uniform();
-            r4 = StdRandom.uniform();
+            randomValues = new Randoms();
             //setear E0
             baseEnergy = 2 * StdRandom.uniform(-1,1);
             //calcular energia de escape de la presa
@@ -72,7 +63,7 @@ public class Swarm {
                 do {
                     // En nuestro caso, debemos considerar el g y el randomhawk, el cual debe utilizarse en el move según las ecuaciones del paper
                     randomHawk.copy(swarm.get(StdRandom.uniform(populationSize)));
-                    randomHawk.move(g, theta, alpha, betaMove, escapeEnergy);
+                    randomHawk.move(g, theta, alpha, beta, escapeEnergy, randomValues, averagePositionOfSwarm());
                 } while(!randomHawk.isFeasible());
             }
             for (int i_hawk = 0; i_hawk < populationSize; i_hawk++) {
@@ -86,9 +77,9 @@ public class Swarm {
     }
 
 
-    private double averagePositionOfSwarm(List<Hawk> swarm) {
-
-        return 0;
+    private double averagePositionOfSwarm() {
+        double sumxt = 0;
+        return sumxt/populationSize;
     }
 
     private void log(int t) {

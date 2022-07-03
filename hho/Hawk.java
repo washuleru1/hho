@@ -1,16 +1,21 @@
-import java.util.Random;
 
 public class Hawk extends Problem {
     //posición del halcon
 
     private int[] x = new int[nVars];
 	private int[] p = new int[nVars];
-	private double[] v = new double[nVars];
+	private int S = 0;
+	private double v, r, u = 0;
+	private final int LB = 0;
+	private final int UB = 1;
+	private double rabbitJump = 0;
+	private double sigma = 0;
+	private double deltaXt = 0;
+	private double Y, levyFlight, Z = 0;
 
 	public Hawk() {
 		for (int j = 0; j < nVars; j++) {
 			x[j] = StdRandom.uniform(2);
-			v[j] = 0;
 		}
 	}
 
@@ -47,48 +52,48 @@ public class Hawk extends Problem {
 		return checkConstraint(x);
 	}
 
-	protected void move(Hawk g, float theta, float alpha, float beta, double escapeEnergy) {
+	protected void move(Hawk g, float theta, float alpha, double beta, double escapeEnergy, Randoms randomValues, double averageHawksPosition) {
+		// el randomHawk es el this, es el halcon seleccionado de forma randomica
 		for (int j = 0; j < nVars; j++) {
-			/* Actualizar velocidad */
-			v[j] = v[j] * theta + alpha * StdRandom.uniform() * (g.p[j] - x[j]) + beta * StdRandom.uniform() * (p[j] - x[j]);
 			/* Actualizar posicion */
-			x[j] = toBinary(x[j] + v[j]);
 
 			//ver si se deja lo de arriba, x[j] es la posición del hawk, pero no utilizamos las velocidades
 			if(Math.abs(escapeEnergy) >= 1 ) {
 				//ecuacion 1 
-				if(q >= 0.5) {
-					actualHawkPosition = swarm.get(i_hawk).getPositionVector();
-					x[j+1]  =  g.x[j] - r1 * Math.abs(randomHawk.getPositionVector() - (2 * r2* actualHawkPosition));
+				if(randomValues.getQ() >= 0.5) {
+					x[j]  =  toBinary(x[j] - randomValues.getR1() * Math.abs(x[j] - (2 * randomValues.getR2() * g.x[j])));
 				} else {    
-					averageHawksPosition = averagePositionOfSwarm(swarm);
-					x[j+1] =randomHawk. - averageHawksPosition - r3 * (LB + r4 * (UB - LB));
+					x[j] = toBinary(p[j] - averageHawksPosition - randomValues.getR3() * (LB + randomValues.getR4() * (UB - LB)));
 				}
-				swarm.get(i_hawk).copy(randomHawk);
  
 			} else {
 				r = StdRandom.uniform();
 				u = StdRandom.uniform();
 				v = StdRandom.uniform();
-				sigma = Math.pow((r * (1 + beta) * Math.sin((Math.PI*beta)/2))/(r * ((1 + beta)/2) * beta * (2*(beta-1)/2)), (1/beta));
+				sigma = Math.pow((gammaFunction(1 + beta) * Math.sin((Math.PI*beta)/2))/(gammaFunction((1 + beta)/2) * beta * (2*(beta-1)/2)), (1/beta));
 				//comparar r y e
 				rabbitJump = 2 * (1 - StdRandom.uniform());
 				if(r >= 0.5 && Math.abs(escapeEnergy) >= 0.5) { //soft beseige
-					x[j+1] = (deltaXt) - escapeEnergy * Math.abs((rabbitJump * xrabbit) - xt);
-					// update the location vector (updatePBest?) usando la ecuación (4) del paper
-					// X(t+1)
+					deltaXt = p[j] - x[j];
+					x[j] = toBinary((deltaXt) - escapeEnergy * Math.abs((rabbitJump * p[j]) - x[j]));
 				} else if (r >= 0.5 && Math.abs(escapeEnergy) < 0.5) { // hard beseige
 					// // update the location vector (updatePBest?) usando la ecuación (6) del paper
-					x[j+1] = xrabbit - escapeEnergy * Math.abs(deltaXt);
+					x[j] = toBinary(p[j] - escapeEnergy * Math.abs(deltaXt));
 				} else if (r < 0.5 && Math.abs(escapeEnergy) >= 0.5) { // soft beseige with progressive rapid dives
 					// // update the location vector (updatePBest?) usando la ecuación (10) del paper
+					S = StdRandom.uniform(2);
 					//primero calcular (7)
-					Y = xrabbit - escapeEnergy * Math.abs((rabbitJump * xrabbit) - xt);
+					Y = p[j] - escapeEnergy * Math.abs((rabbitJump * p[j]) - x[j]);
 					//Calcular (9)
 					levyFlight = 0.01 * (u*sigma/Math.pow(Math.abs(v), (1/beta)));
 					//calcular (10)
+					Z = Y + S * levyFlight;
+					if (toBinary(Y) < x[j]) x[j] = toBinary(Y);
+					if (toBinary(Z) < x[j]) x[j] = toBinary(Z);
+
 				} else if (r < 0.5 && Math.abs(escapeEnergy) < 0.5) { // hard beseige with progressive rapid dives
 					// // update the location vector (updatePBest?) usando la ecuación (11) del paper
+					
 				} 
 			}
 
@@ -125,6 +130,16 @@ public class Hawk extends Problem {
 		return String.format("optimal value: %d, fitness: %d, diff: %.1f, rpd: %.2f%%, p: %s", optimum(),
 				computeFitnessPBest(), diff(), rpd(), showSolution());
 	}
+
+	static double logGamma(double x) {
+		double tmp = (x - 0.5) * Math.log(x + 4.5) - (x + 4.5);
+		double ser = 1.0 + 76.18009173    / (x + 0)   - 86.50532033    / (x + 1)
+						 + 24.01409822    / (x + 2)   -  1.231739516   / (x + 3)
+						 +  0.00120858003 / (x + 4)   -  0.00000536382 / (x + 5);
+		return tmp + Math.log(ser * Math.sqrt(2 * Math.PI));
+	}
+
+	static double gammaFunction(double x) { return Math.exp(logGamma(x)); }
 
 
 
