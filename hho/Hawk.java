@@ -72,7 +72,6 @@ public class Hawk extends Problem {
 				r = StdRandom.uniform();
 				u = StdRandom.uniform();
 				v = StdRandom.uniform();
-				sigma = Math.pow((gammaFunction(1 + beta) * Math.sin((Math.PI*beta)/2))/(gammaFunction((1 + beta)/2) * beta * (2*(beta-1)/2)), (1/beta));
 				//comparar r y e
 				rabbitJump = 2 * (1 - StdRandom.uniform());
 				if(r >= 0.5 && Math.abs(escapeEnergy) >= 0.5) { //soft beseige
@@ -87,6 +86,7 @@ public class Hawk extends Problem {
 					//primero calcular (7)
 					Y = p[j] - escapeEnergy * Math.abs((rabbitJump * p[j]) - x[j]);
 					//Calcular (9)
+					sigma = Math.pow((gammaFunction(1 + beta) * Math.sin((Math.PI*beta)/2))/(gammaFunction((1 + beta)/2) * beta * (2*(beta-1)/2)), (1/beta));
 					levyFlight = 0.01 * (u*sigma/Math.pow(Math.abs(v), (1/beta)));
 					//calcular (10)
 					Z = Y + S * levyFlight;
@@ -99,6 +99,7 @@ public class Hawk extends Problem {
 					//primero calcular (7)
 					Y = p[j] - escapeEnergy * Math.abs((rabbitJump * p[j]) - averageHawksPosition);
 					//Calcular (9)
+					sigma = Math.pow((gammaFunction(1 + beta) * Math.sin((Math.PI*beta)/2))/(gammaFunction((1 + beta)/2) * beta * (2*(beta-1)/2)), (1/beta));
 					levyFlight = 0.01 * (u*sigma/Math.pow(Math.abs(v), (1/beta)));
 					//calcular (10)
 					Z = Y + S * levyFlight;

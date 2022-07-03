@@ -43,10 +43,10 @@ public class Swarm {
 
     private void evolve() {
         int iteration = 1;
+        Hawk randomHawk = new Hawk();
         while (iteration <= maxItter){
             //System.out.println("Itteration: "+ iteration);
             //creación de random hawk
-            Hawk randomHawk = new Hawk();
             // seteo de valores random
             // pasar q y r's a función move, mejor pasarlo como objeto estilo: move(randoms, ....) donde  randoms contiene: randoms.r1, randoms.r2, randoms.q, ...
             randomValues = new Randoms();
@@ -73,7 +73,7 @@ public class Swarm {
                 }
             }
             log(iteration);
-            System.out.println("baseEnergy: "+baseEnergy+ " EscapeEnergy"+escapeEnergy);
+            //System.out.println("baseEnergy: "+baseEnergy+ " EscapeEnergy"+escapeEnergy);
             iteration++;
         }
     }
@@ -84,11 +84,10 @@ public class Swarm {
             xm = xm + swarm.get(i).avgA();
         }
         double promedio = xm/populationSize;
-        System.out.println("Promedio: "+promedio);
+        //System.out.println("Promedio: "+promedio);
         double random = StdRandom.uniform()/populationSize;
-        System.out.println("Random: "+random);
-
-		return promedio;
+        //System.out.println("Random: "+random);
+		return random;
 	}
 
     private void log(int t) {
