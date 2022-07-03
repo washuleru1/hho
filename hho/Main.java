@@ -2,7 +2,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			for (int i = 0; i < 30; i++) {
+			for (int i = 0; i < 2; i++) {
 				StdRandom.newSeed();
 				new Swarm().execute();
 			}
