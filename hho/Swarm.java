@@ -56,6 +56,7 @@ public class Swarm {
             Hawk randomHawk = new Hawk();
             int[] actualHawkPosition;
             // seteo de valores random
+            // pasar q y r's a función move, mejor pasarlo como objeto estilo: move(randoms, ....) donde  randoms contiene: randoms.r1, randoms.r2, randoms.q, ...
             q = StdRandom.uniform();
             r1 = StdRandom.uniform();
             r2 = StdRandom.uniform();
@@ -69,10 +70,10 @@ public class Swarm {
             // si el valor absoluto de E es >= 1 se utiliza función (1) paper
             for (int i_hawk = 0; i_hawk < populationSize; i_hawk++) {
                 do {
+                    // En nuestro caso, debemos considerar el g y el randomhawk, el cual debe utilizarse en el move según las ecuaciones del paper
                     randomHawk.copy(swarm.get(StdRandom.uniform(populationSize)));
                     randomHawk.move(g, theta, alpha, betaMove, escapeEnergy);
                 } while(!randomHawk.isFeasible());
-                
             }
             for (int i_hawk = 0; i_hawk < populationSize; i_hawk++) {
                 if (swarm.get(i_hawk).isBetterThan(g)) {
