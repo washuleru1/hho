@@ -68,49 +68,10 @@ public class Swarm {
             // calculo del salto del conejo "j"
             // si el valor absoluto de E es >= 1 se utiliza función (1) paper
             for (int i_hawk = 0; i_hawk < populationSize; i_hawk++) {
-
-                
-                if(Math.abs(escapeEnergy) >= 1 ) {
-                    //ecuacion 1 
-                    do {
-                        randomHawk.copy(swarm.get(StdRandom.uniform(populationSize)));
-                        randomHawk.move(g, theta, alpha, betaMove);
-                    } while(!randomHawk.isFeasible());
-
-                    if(q >= 0.5) {
-                        actualHawkPosition = swarm.get(i_hawk).getPositionVector();
-                        nextLocation[iteration]  =  randomHawk.getPositionVector() - r1 * Math.abs(randomHawk.getPositionVector() - (2 * r2* actualHawkPosition));
-                    } else {    
-                        averageHawksPosition = averagePositionOfSwarm(swarm);
-                        randomHawk. - averageHawksPosition - r3 * (LB + r4 * (UB - LB));
-                    }
-                    swarm.get(i_hawk).copy(randomHawk);
-     
-                } else {
-                    r = StdRandom.uniform();
-                    u = StdRandom.uniform();
-                    v = StdRandom.uniform();
-                    sigma = Math.pow((r * (1 + beta) * Math.sin((Math.PI*beta)/2))/(r * ((1 + beta)/2) * beta * (2*(beta-1)/2)), (1/beta));
-                    //comparar r y e
-                    rabbitJump = 2 * (1 - StdRandom.uniform());
-                    if(r >= 0.5 && Math.abs(escapeEnergy) >= 0.5) { //soft beseige
-                        nextLocation = (deltaXt) - escapeEnergy * Math.abs((rabbitJump * xrabbit) - xt);
-                        // update the location vector (updatePBest?) usando la ecuación (4) del paper
-                        // X(t+1)
-                    } else if (r >= 0.5 && Math.abs(escapeEnergy) < 0.5) { // hard beseige
-                        // // update the location vector (updatePBest?) usando la ecuación (6) del paper
-                        nextLocation = xrabbit - escapeEnergy * Math.abs(deltaXt);
-                    } else if (r < 0.5 && Math.abs(escapeEnergy) >= 0.5) { // soft beseige with progressive rapid dives
-                        // // update the location vector (updatePBest?) usando la ecuación (10) del paper
-                        //primero calcular (7)
-                        Y = xrabbit - escapeEnergy * Math.abs((rabbitJump * xrabbit) - xt);
-                        //Calcular (9)
-                        levyFlight = 0.01 * (u*sigma/Math.pow(Math.abs(v), (1/beta)));
-                        //calcular (10)
-                    } else if (r < 0.5 && Math.abs(escapeEnergy) < 0.5) { // hard beseige with progressive rapid dives
-                        // // update the location vector (updatePBest?) usando la ecuación (11) del paper
-                    } 
-                }
+                do {
+                    randomHawk.copy(swarm.get(StdRandom.uniform(populationSize)));
+                    randomHawk.move(g, theta, alpha, betaMove, escapeEnergy);
+                } while(!randomHawk.isFeasible());
                 
             }
             for (int i_hawk = 0; i_hawk < populationSize; i_hawk++) {

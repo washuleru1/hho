@@ -47,7 +47,7 @@ public class Hawk extends Problem {
 		return checkConstraint(x);
 	}
 
-	protected void move(Hawk g, float theta, float alpha, float beta) {
+	protected void move(Hawk g, float theta, float alpha, float beta, double escapeEnergy) {
 		for (int j = 0; j < nVars; j++) {
 			/* Actualizar velocidad */
 			v[j] = v[j] * theta + alpha * StdRandom.uniform() * (g.p[j] - x[j]) + beta * StdRandom.uniform() * (p[j] - x[j]);
@@ -55,7 +55,42 @@ public class Hawk extends Problem {
 			x[j] = toBinary(x[j] + v[j]);
 
 			//ver si se deja lo de arriba, x[j] es la posición del hawk, pero no utilizamos las velocidades
-			
+			if(Math.abs(escapeEnergy) >= 1 ) {
+				//ecuacion 1 
+				if(q >= 0.5) {
+					actualHawkPosition = swarm.get(i_hawk).getPositionVector();
+					x[j+1]  =  g.x[j] - r1 * Math.abs(randomHawk.getPositionVector() - (2 * r2* actualHawkPosition));
+				} else {    
+					averageHawksPosition = averagePositionOfSwarm(swarm);
+					x[j+1] =randomHawk. - averageHawksPosition - r3 * (LB + r4 * (UB - LB));
+				}
+				swarm.get(i_hawk).copy(randomHawk);
+ 
+			} else {
+				r = StdRandom.uniform();
+				u = StdRandom.uniform();
+				v = StdRandom.uniform();
+				sigma = Math.pow((r * (1 + beta) * Math.sin((Math.PI*beta)/2))/(r * ((1 + beta)/2) * beta * (2*(beta-1)/2)), (1/beta));
+				//comparar r y e
+				rabbitJump = 2 * (1 - StdRandom.uniform());
+				if(r >= 0.5 && Math.abs(escapeEnergy) >= 0.5) { //soft beseige
+					x[j+1] = (deltaXt) - escapeEnergy * Math.abs((rabbitJump * xrabbit) - xt);
+					// update the location vector (updatePBest?) usando la ecuación (4) del paper
+					// X(t+1)
+				} else if (r >= 0.5 && Math.abs(escapeEnergy) < 0.5) { // hard beseige
+					// // update the location vector (updatePBest?) usando la ecuación (6) del paper
+					x[j+1] = xrabbit - escapeEnergy * Math.abs(deltaXt);
+				} else if (r < 0.5 && Math.abs(escapeEnergy) >= 0.5) { // soft beseige with progressive rapid dives
+					// // update the location vector (updatePBest?) usando la ecuación (10) del paper
+					//primero calcular (7)
+					Y = xrabbit - escapeEnergy * Math.abs((rabbitJump * xrabbit) - xt);
+					//Calcular (9)
+					levyFlight = 0.01 * (u*sigma/Math.pow(Math.abs(v), (1/beta)));
+					//calcular (10)
+				} else if (r < 0.5 && Math.abs(escapeEnergy) < 0.5) { // hard beseige with progressive rapid dives
+					// // update the location vector (updatePBest?) usando la ecuación (11) del paper
+				} 
+			}
 
 
 		}
