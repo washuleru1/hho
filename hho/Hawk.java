@@ -1,4 +1,3 @@
-
 public class Hawk extends Problem {
     //posición del halcon
 
@@ -56,7 +55,6 @@ public class Hawk extends Problem {
 		// el randomHawk es el this, es el halcon seleccionado de forma randomica
 		for (int j = 0; j < nVars; j++) {
 			/* Actualizar posicion */
-
 			//ver si se deja lo de arriba, x[j] es la posición del hawk, pero no utilizamos las velocidades
 			if(Math.abs(escapeEnergy) >= 1 ) {
 				//ecuacion 1 
@@ -157,4 +155,5 @@ public class Hawk extends Problem {
 	protected double avgA() {
     	return avg(x);
     }
+
 }

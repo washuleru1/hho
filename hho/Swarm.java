@@ -6,7 +6,7 @@ public class Swarm {
     private final float theta = 0.9f, alpha = 2f;
     private List<Hawk> swarm = null;
     private Hawk g = null;
-    private final int maxItter = 1000;
+    private final int maxItter = 400;
     private final int populationSize = 25;
     private static final double beta = 1.5;
     private double escapeEnergy = 0;
@@ -22,7 +22,7 @@ public class Swarm {
     }
 
     private void init() {
-        swarm = new ArrayList<Hawk>();
+        swarm = new java.util.ArrayList<>();
         g = new Hawk();
         Hawk hawk = null;
         for (int i = 1; i <= populationSize; i++) {
@@ -37,8 +37,6 @@ public class Swarm {
 			if (swarm.get(i).isBetterThan(g))
 				g.copy(swarm.get(i));
 		log(0);
-
-
     }
 
     private void evolve() {
@@ -83,11 +81,10 @@ public class Swarm {
         for (int i = 0; i < populationSize; i++) {
             xm = xm + swarm.get(i).avgA();
         }
-        double promedio = xm/populationSize;
-        //System.out.println("Promedio: "+promedio);
-        double random = StdRandom.uniform()/populationSize;
+        double promedio = (xm/populationSize);
+        //double random = StdRandom.uniform()/populationSize;
         //System.out.println("Random: "+random);
-		return random;
+		return promedio;
 	}
 
     private void log(int t) {
