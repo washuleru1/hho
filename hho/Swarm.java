@@ -43,27 +43,79 @@ public class Swarm {
         int iteration = 1;
         Hawk randomHawk = new Hawk();
         while (iteration <= maxItter){
-            //System.out.println("Itteration: "+ iteration);
+            System.out.println("Itteration: "+ iteration);
             //creación de random hawk
             // seteo de valores random
             // pasar q y r's a función move, mejor pasarlo como objeto estilo: move(randoms, ....) donde  randoms contiene: randoms.r1, randoms.r2, randoms.q, ...
             randomValues = new Randoms();
-            //setear E0
-            baseEnergy = StdRandom.uniform(Lower, Upper);
+            
+           
             //calcular energia de escape de la presa
-            escapeEnergy = 2 * baseEnergy * (1 - (iteration/ maxItter)); 
+            double r = StdRandom.uniform();
             // calculo del salto del conejo "j"
             // si el valor absoluto de E es >= 1 se utiliza función (1) paper
+            double S = StdRandom.uniform(2);
+			double u = StdRandom.uniform();
+			double v = StdRandom.uniform();
+            double rabbitJump = 2 * (1 - StdRandom.uniform());
             double averageItterationPositionOfSwarm = averagePositionOfSwarm();
             for (int i_hawk = 0; i_hawk < populationSize; i_hawk++) {
-                do {
-                    // En nuestro caso, debemos considerar el g y el randomhawk, el cual debe utilizarse en el move según las ecuaciones del paper
-                    randomHawk.copy(swarm.get(StdRandom.uniform(populationSize)));
-                    randomHawk.move(g, theta, alpha, beta, escapeEnergy, randomValues, averageItterationPositionOfSwarm);
-                } while(!randomHawk.isFeasible());
+                S = StdRandom.uniform(2);
+                //setear E0
+                //--- desde aca se updatean para cada halcon segun el paper
+                baseEnergy = StdRandom.uniform(Lower, Upper);
+                escapeEnergy = 2 * baseEnergy * (1 - (iteration/ maxItter));
+                rabbitJump = 2 * (1 - StdRandom.uniform());
+                // hasta aca se updatean para cada halcon segun el paper
+                r = StdRandom.uniform();
+                if (Math.abs(escapeEnergy) >= 1) {
+                    //exploration
+                    averageItterationPositionOfSwarm = averagePositionOfSwarm();
+                    System.out.println("Exploration");
+                    do {
+                        // En nuestro caso, debemos considerar el g y el randomhawk, el cual debe utilizarse en el move según las ecuaciones del paper
+                        randomHawk.copy(swarm.get(StdRandom.uniform(populationSize)));
+                        randomHawk.exploration(g, randomValues, averageItterationPositionOfSwarm);
+                    } while(!randomHawk.isFeasible());
+                    swarm.get(i_hawk).copy(randomHawk);
+                } else {
+                    System.out.println("Exploit");
+                    //Exploitation
+                    randomHawk.copy(swarm.get(i_hawk));
+                    if(r >= 0.5 && Math.abs(escapeEnergy) >= 0.5) { //soft beseige
+                        System.out.println("Soft Beseige");
+                        do {
+                            randomHawk.softBeseige(g, escapeEnergy, rabbitJump);
+                            
+                        } while (!randomHawk.isFeasible());
+                    } else if (r >= 0.5 && Math.abs(escapeEnergy) < 0.5) { //hard beseige
+                        System.out.println("Hard Beseige");
+                        do {
+                            randomHawk.hardBeseige(g, escapeEnergy);
+                        } while (!randomHawk.isFeasible());
+                    } else if (r < 0.5 && Math.abs(escapeEnergy) >= 0.5) { // soft beseige with progresive
+                        System.out.println("SOFT PROGRESIVE");
+                        do {
+                            randomHawk.softBeseigeProgresive(g, escapeEnergy, beta, S, u, v, rabbitJump);
+                        } while (!randomHawk.isFeasible());
+                    } else if (r < 0.5 && Math.abs(escapeEnergy) < 0.5) { // hard beseige with progresive
+                        System.out.println("HARD PROGRESIVE");
+                        averageItterationPositionOfSwarm = averagePositionOfSwarm();
+                        do {
+                            randomHawk.hardBeseigeProgresive(g, escapeEnergy, beta, averageItterationPositionOfSwarm, S, u, v, rabbitJump);
+                        } while (!randomHawk.isFeasible());
+                    }
+                    swarm.get(i_hawk).copy(randomHawk);
+
+                }
+                if (randomHawk.isBetterThan(g)) {
+					g.copy(randomHawk);
+				}
                 if (randomHawk.isBetterThanPBest())
 					randomHawk.updatePBest();
-				swarm.get(i_hawk).copy(randomHawk);
+
+                swarm.get(i_hawk).copy(randomHawk);
+				
             }
             for (int i_hawk = 0; i_hawk < populationSize; i_hawk++) {
                 if (swarm.get(i_hawk).isBetterThan(g)) {

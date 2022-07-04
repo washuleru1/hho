@@ -51,6 +51,82 @@ public class Hawk extends Problem {
 		return checkConstraint(x);
 	}
 
+	protected void exploration(Hawk g, Randoms randomValues, double averageHawksPosition) {
+		for (int j = 0; j < nVars; j++) {
+			if(randomValues.getQ() >= 0.5) {
+				x[j]  =  toBinary(x[j] - randomValues.getR1() * Math.abs(x[j] - (2 * randomValues.getR2() * g.x[j])));
+			} else {
+				x[j] = toBinary(p[j] - averageHawksPosition - randomValues.getR3() * (LB + randomValues.getR4() * (UB - LB)));
+			}
+		}
+	}
+
+	protected void softBeseige(Hawk g, double escapeEnergy, double rabbitJump) {
+		for (int j = 0; j < nVars; j++) {
+			deltaXt = g.x[j] - x[j];
+			x[j] = toBinary((deltaXt) - escapeEnergy * Math.abs((rabbitJump * g.x[j]) - x[j]));
+		}	
+	}
+
+	protected void hardBeseige(Hawk g, double escapeEnergy) {
+		for (int j = 0; j < nVars; j++) {
+			deltaXt = g.x[j] - x[j];
+			x[j] = toBinary(g.x[j] - escapeEnergy * Math.abs(deltaXt));
+		}
+	}
+
+	protected void softBeseigeProgresive(Hawk g, double escapeEnergy, double beta, double S, double u, double v, double rabbitJump) {
+		// la duda es si rabbitJump es en cada nvars o por cada iteracion
+		
+		for (int j = 0; j < nVars; j++) {
+			S = StdRandom.uniform(2);
+			u = StdRandom.uniform();
+			v = StdRandom.uniform();
+			//primero calcular (7)
+			Y = g.x[j] - escapeEnergy * Math.abs((rabbitJump * g.x[j]) - x[j]);
+			//Calcular (9)
+			double gamma1 = gammaFunction(1 + beta);
+			double gamma2 = gammaFunction((1 + beta)/2);
+			sigma = Math.pow((gamma1 * Math.sin((Math.PI*beta)/2))/( gamma2 * beta * (2*(beta-1)/2)), (1/beta));
+			levyFlight = 0.01 * (u*sigma/Math.pow(Math.abs(v), (1/beta)));
+			//calcular (10)
+			//System.out.println("Y:"+Y);
+			//System.out.println("P:"+g.p[j]);
+			Z = Y + S * levyFlight;
+			if (toBinary(Y) < x[j]) {
+				x[j] = toBinary(Y);
+			}
+			if (toBinary(Z) < x[j]) {
+				x[j] = toBinary(Z);
+			}
+		}			
+	}
+
+	protected void hardBeseigeProgresive(Hawk g, double escapeEnergy, double beta, double averageHawksPosition, double S, double u, double v, double rabbitJump) {
+		
+		for (int j = 0; j < nVars; j++) {
+			S = StdRandom.uniform(2);
+			//primero calcular (7)
+			Y = g.x[j] - escapeEnergy * Math.abs((rabbitJump * g.x[j]) - averageHawksPosition);
+			//System.out.println("Y:"+Y);
+			//System.out.println("P:"+g.p[j]);
+			//Calcular (9)
+			double gamma1 = gammaFunction(1 + beta);
+			double gamma2 = gammaFunction((1 + beta)/2);
+			sigma = Math.pow((gamma1 * Math.sin((Math.PI*beta)/2))/( gamma2 * beta * (2*(beta-1)/2)), (1/beta));
+			levyFlight = 0.01 * (u*sigma/Math.pow(Math.abs(v), (1/beta)));
+			//calcular (10)
+			Z = Y + S * levyFlight;
+			if (toBinary(Y) < computeFitness(x)) {
+				x[j] = toBinary(Y);
+			}
+			if (toBinary(Z) < computeFitness(x)) {
+				x[j] = toBinary(Z);
+			}
+		}
+					
+	}
+
 	protected void move(Hawk g, float theta, float alpha, double beta, double escapeEnergy, Randoms randomValues, double averageHawksPosition) {
 		// el randomHawk es el this, es el halcon seleccionado de forma randomica
 		for (int j = 0; j < nVars; j++) {
@@ -60,10 +136,10 @@ public class Hawk extends Problem {
 				//ecuacion 1 
 				if(randomValues.getQ() >= 0.5) {
 					//System.out.println("Position ecc 1.1");
-					x[j]  =  toBinary(x[j] - randomValues.getR1() * Math.abs(x[j] - (2 * randomValues.getR2() * g.x[j])));
+					x[j]  =  toBinary(x[j] - randomValues.getR1() * Math.abs(g.x[j] - (2 * randomValues.getR2() * g.x[j])));
 				} else {  
 					//System.out.println("Position ecc 1.2");  
-					x[j] = toBinary(p[j] - averageHawksPosition - randomValues.getR3() * (LB + randomValues.getR4() * (UB - LB)));
+					x[j] = toBinary(g.p[j] - averageHawksPosition - randomValues.getR3() * (LB + randomValues.getR4() * (UB - LB)));
 				}
  
 			} else {
